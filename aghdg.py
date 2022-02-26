@@ -1,35 +1,87 @@
 import tkinter as tk
+import ctypes
+import threading
 
-def keyup(e):
-    print ('up', e.char)
-def keydown(e):
-    print ('down', e.char)
+BLOCK_SIZE = 64
 
-def New_Window(ws: tk.Tk):
-    wins = []
+user32 = ctypes.windll.user32
+screensize = user32.GetSystemMetrics(0), user32.GetSystemMetrics(1)
 
-    ws.withdraw()
-    ws.deiconify()
+grid = list(range(screensize[0]))
 
-    for i in range(3):
-        Window = tk.Toplevel()
-        Window.bind("<KeyPress>", keydown)
-        Window.bind("<KeyRelease>", keyup)
-        canvas = tk.Canvas(Window, height=64, width=64)
-        canvas.pack()
+class Block():
 
-        Window.geometry("64x64+{}+0".format(i * 128))
+    def __init__(self, root: tk.Tk):
+        self.windows = []
 
-        wins.append(Window)
+        root.withdraw()
+        root.deiconify()
 
-    wins[0].focus_set()
+        for i in range(3):
+            cWin = tk.Toplevel()
+            cWin.bind("<KeyPress>", self.keydown)
+            cWin.bind("<KeyRelease>", self.keyup)
+            canvas = tk.Canvas(cWin, height=BLOCK_SIZE, width=BLOCK_SIZE)
+            canvas.pack()
 
-    return wins
+            cWin.geometry("{0}x{0}+{1}+0".format(BLOCK_SIZE, i * (BLOCK_SIZE * 2)))
+
+            self.windows.append(cWin)
+
+        self.windows[0].focus_set()
+
+    def keyup(self, e: tk.Event):
+        pass
+    
+    def keydown(self, e: tk.Event):
+        lastWin = lastWinPos = mod = 0
+
+        if e.keysym == "Right" or e.keysym == "Left":
+            if e.keysym == "Right":
+                mod = BLOCK_SIZE
+
+                lastWin = self.windows[len(self.windows) - 1]
+                lastWinPos = lastWin.winfo_x() 
+
+            elif e.keysym == "Left":
+                mod = -BLOCK_SIZE
+
+                lastWin = self.windows[0]
+                lastWinPos = lastWin.winfo_x() 
+
+            if (((lastWinPos + (BLOCK_SIZE * 2)) + mod > screensize[0]) or (lastWinPos + mod < 0)):
+                return
+
+            for i, k in enumerate(self.windows):
+                curX = k.winfo_x()
+                curY = k.winfo_y()
+
+                k.geometry("{0}x{0}+{1}+{2}".format(BLOCK_SIZE, (curX + mod), curY))
+        else:
+            if e.keysym == "Down":
+                mod = BLOCK_SIZE
+
+                lastWin = self.windows[0]
+                lastWinPos = lastWin.winfo_y() 
+
+                if ((lastWinPos + BLOCK_SIZE + mod > screensize[1])):
+                    return
+
+                for i, k in enumerate(self.windows):
+                    curX = k.winfo_x()
+                    curY = k.winfo_y()
+
+                    k.geometry("{0}x{0}+{1}+{2}".format(BLOCK_SIZE, curX, (curY + mod)))
+
+                
+                
+    
+
 
 if __name__ == "__main__":
 
     ws = tk.Tk()
 
-    blocks = New_Window(ws)
+    blocks = Block(ws)
 
     ws.mainloop()
