@@ -1,16 +1,9 @@
 import tkinter as tk
-import ctypes
-import threading
+from dfsdfs import Game, BLOCK_SIZE
 
-BLOCK_SIZE = 64
-
-user32 = ctypes.windll.user32
-screensize = user32.GetSystemMetrics(0), user32.GetSystemMetrics(1)
-
-grid = list(range(screensize[0]))
+game = Game()
 
 class Block():
-
     def __init__(self, root: tk.Tk):
         self.windows = []
 
@@ -49,7 +42,7 @@ class Block():
                 lastWin = self.windows[0]
                 lastWinPos = lastWin.winfo_x() 
 
-            if (((lastWinPos + (BLOCK_SIZE * 2)) + mod > screensize[0]) or (lastWinPos + mod < 0)):
+            if (((lastWinPos + (BLOCK_SIZE * 2)) + mod > game.screensize[0]) or (lastWinPos + mod < 0)):
                 return
 
             for i, k in enumerate(self.windows):
@@ -64,7 +57,7 @@ class Block():
                 lastWin = self.windows[0]
                 lastWinPos = lastWin.winfo_y() 
 
-                if ((lastWinPos + BLOCK_SIZE + mod > screensize[1])):
+                if ((lastWinPos + BLOCK_SIZE + mod > game.screensize[1])):
                     return
 
                 for i, k in enumerate(self.windows):
@@ -73,15 +66,13 @@ class Block():
 
                     k.geometry("{0}x{0}+{1}+{2}".format(BLOCK_SIZE, curX, (curY + mod)))
 
-                
-                
-    
-
 
 if __name__ == "__main__":
 
     ws = tk.Tk()
 
     blocks = Block(ws)
+
+
 
     ws.mainloop()
