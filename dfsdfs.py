@@ -53,6 +53,7 @@ class Game():
         self.current_block = None
         self.bottom = (1535, 1150)
         self.blocks = []
+        # self.rows = [[0 for i in range(15)] for k in range(10)]
         self.next_shape = None
         
     def add_block(self, block):
