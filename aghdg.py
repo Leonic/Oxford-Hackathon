@@ -114,44 +114,45 @@ def next_block():
 
     game.add_block(Block(ws, game, shapes[random.randrange(0, len(shapes))]))
 
-def game_loop(g:Game):
+def game_loop(game:Game):
     while True:
-        collided = False
         # create list of coords in one block
 
-        for i in g.current_block.windows:
+        for i in game.current_block.windows:
             for k in i:
                 if k:
                     
+                    collided = False
                     currX = k.winfo_x()
                     currY = k.winfo_y()
                     print(currX,currY)
 
-                    if (currY + BLOCK_SIZE*2 >= (g.bottom[1])):
+                    if (currY + BLOCK_SIZE*2 >= (game.bottom[1])):
                         collided = True
                     
-                    otherBlocks = []
+                    else:
+                        otherBlocks = []
 
-                    for m in g.blocks:
-                        if m != g.current_block:
-                            for v in m.windows:
-                                    for y in v:
-                                        if v != y:
-                                            if y:
-                                                print("main:",(currX,currY),"secondary:",(y.winfo_x(),y.winfo_y()))
+                        for block in game.blocks:
+                            if block != game.current_block:
+                                for window in block.windows:
+                                        for u in window:
+                                            if window != u:
+                                                if u:
+                                                    print("main:",(currX,currY),"secondary:",(u.winfo_x(),u.winfo_y()))
 
-                                                collided = y.winfo_y() >= currY and y.winfo_y() <= currY + BLOCK_SIZE
-                                                collided |= y.winfo_x() >= currX and y.winfo_x()  <= currX + BLOCK_SIZE
+                                                    collided = u.winfo_y() >= currY and u.winfo_y() <= currY + BLOCK_SIZE
+                                                    collided |= u.winfo_x() >= currX and u.winfo_x()  <= currX + BLOCK_SIZE
 
-                                                assert(y != k)
-                                                assert(collided == False)
+                                                    assert(u != k)
+                                                    assert(collided == False)
 
                     
                                         
                                         
         
         if not collided:
-            for i in g.current_block.windows:
+            for i in game.current_block.windows:
                 for k in i:
                     if k:
                         currX = k.winfo_x()
