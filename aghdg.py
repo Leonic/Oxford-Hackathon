@@ -2,11 +2,10 @@ import threading
 from time import sleep
 import tkinter as tk
 import random
-from dfsdfs import TETRIS, TETRIS_S, TETRIS_SQUARE, Game, BLOCK_SIZE, COLOURS
+from dfsdfs import TETRIS, TETRIS_LEL, TETRIS_LINE, TETRIS_SQUARE, TETRIS_TEE, Game, BLOCK_SIZE, TETRIS_SKEW, COLOURS
 
-ws = tk.Tk()
-nextLabel = tk.StringVar()
 game = Game()
+
 class Block():
     def __init__(self, root: tk.Tk, host: Game, block):
         # Generate a 2D array to match the tetris array
@@ -16,7 +15,7 @@ class Block():
         root.withdraw()
         root.deiconify()
 
-        colour = COLOURS[random.randrange(0, len(COLOURS))]
+        self.colour = COLOURS[random.randint(0, len(COLOURS))]
 
         for i, k in enumerate(zip(*block)):
             for j, g in enumerate(k):
@@ -25,7 +24,7 @@ class Block():
                     cWin.bind("<KeyPress>", self.keydown)
                     cWin.bind("<KeyRelease>", self.keyup)
 
-                    canvas = tk.Canvas(cWin, height=BLOCK_SIZE, width=BLOCK_SIZE, bg=colour)
+                    canvas = tk.Canvas(cWin, height=BLOCK_SIZE, width=BLOCK_SIZE, bg=self.colour)
                     canvas.configure(width=cWin.winfo_width(), height=cWin.winfo_height())
                     # text = tk.Text(canvas)
                     # text.insert(1.0, str("{0}, {1}".format(i, j)))
@@ -115,9 +114,9 @@ class Block():
                 next_block()
 
 def next_block():
+
     game.next_shape = random.randrange(0, len(TETRIS))
 
-def spawn_block():
     game.add_block(Block(ws, game, TETRIS[game.next_shape]))
 
 def game_loop(game:Game):
@@ -171,16 +170,11 @@ def game_loop(game:Game):
 
 if __name__ == "__main__":
 
-    label = tk.Label(ws, textvariable=nextLabel, relief=tk.RAISED)
+    ws = tk.Tk()
 
-    if game.next_shape != None:
-        nextLabel.set("Next Shape: {0}".format(TETRIS_S[game.next_shape]))
-    else:
-        nextLabel.set("No Next Shape")
+    blocks = Block(ws, game, TETRIS_SQUARE)
 
-    # Do stuff
-    next_block()
-    spawn_block()
+    game.add_block(blocks)
 
     t = threading.Thread(target=game_loop, args=(game,))
     t.start()
