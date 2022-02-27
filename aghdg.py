@@ -1,86 +1,105 @@
 import tkinter as tk
-from dfsdfs import Game, BLOCK_SIZE
+from dfsdfs import Game, BLOCK_SIZE, TETRIS_SKEW
 
 game = Game()
 
 class Block():
-    def __init__(self, root: tk.Tk):
-        self.windows = []
+    def __init__(self, root: tk.Tk, host: Game, block):
+        # Generate a 2D array to match the tetris array
+        self.windows = [[None for i in range(len(block[1]))] for k in range(len(block))]
+        self.game = host
 
         root.withdraw()
         root.deiconify()
 
-        for i in range(3):
-            cWin = tk.Toplevel()
-            cWin.bind("<KeyPress>", self.keydown)
-            cWin.bind("<KeyRelease>", self.keyup)
-            canvas = tk.Canvas(cWin, height=BLOCK_SIZE, width=BLOCK_SIZE)
-            canvas.pack()
+        for i, k in enumerate(block):
 
-            cWin.geometry("{0}x{0}+{1}+0".format(BLOCK_SIZE, i * (BLOCK_SIZE * 2)))
+            for j, g in enumerate(k):
+                if g == 1:
+                    cWin = tk.Toplevel()
+                    cWin.bind("<KeyPress>", self.keydown)
+                    cWin.bind("<KeyRelease>", self.keyup)
+                    canvas = tk.Canvas(cWin, height=BLOCK_SIZE, width=BLOCK_SIZE)
+                    canvas.pack()
 
-            self.windows.append(cWin)
+                    cWin.geometry("{0}x{0}+{1}+{2}".format(BLOCK_SIZE, i * (BLOCK_SIZE * 2), j * (BLOCK_SIZE * 2)))
 
-        self.windows[0].focus_set()
+                    self.windows[i][j] = cWin
 
     def keyup(self, e: tk.Event):
         pass
     
+    def get_first_window(self) -> tuple:
+        for i, k in enumerate(self.windows):
+            for j, l in enumerate(k):
+                if l != None:
+                    return (l), (i, j)
+        return None
+
+    def get_last_window(self) -> tuple:
+        lastGood = None
+
+        for i, j in enumerate(self.windows):
+            for k, m in enumerate(j):
+                if m != None:
+                    lastGood = (m), (i, k)
+        return lastGood
+
     def get_location(self):
-        curX = self.windows[0].winfo_x()
-        curY = self.windows[len(self.windows) - 1].winfo_y()
+        curX = self.get_first_window()[0].winfo_x()
+        curY = self.get_last_window()[0].winfo_y()
 
         return curX, curY
 
-    def keydown(self, e: tk.Event):
-        lastWin = lastWinPos = mod = 0
+    def get_2D_location(self):
+        curX, curY = self.get_location()
 
+        return curX // BLOCK_SIZE, curY // BLOCK_SIZE
+
+    def keydown(self, e: tk.Event):
+        curX, curY = self.get_2D_location()
+        firstWin, firstIndex = self.get_first_window()
+        lastWin, lastIndex = self.get_last_window()
+        
         if e.char.lower() == "x":
-            print(self.get_location())
+            pass
 
         elif e.keysym == "Right" or e.keysym == "Left":
             if e.keysym == "Right":
                 mod = BLOCK_SIZE
 
-                lastWin = self.windows[len(self.windows) - 1]
-                lastWinPos = lastWin.winfo_x() 
-
             elif e.keysym == "Left":
                 mod = -BLOCK_SIZE
 
-                lastWin = self.windows[0]
-                lastWinPos = lastWin.winfo_x() 
-
-            if (((lastWinPos + (BLOCK_SIZE * 2)) + mod > game.screensize[0]) or (lastWinPos + mod < 0)):
+            if (((curX + (BLOCK_SIZE * len(self.windows[firstIndex[0]]))) + mod > game.screensize[0]) or (firstWin.winfo_x() + mod < 0)):
                 return
 
-            for i, k in enumerate(self.windows):
-                curX = k.winfo_x()
-                curY = k.winfo_y()
-
-                k.geometry("{0}x{0}+{1}+{2}".format(BLOCK_SIZE, (curX + mod), curY))
+            for i in self.windows:
+                for k in i:
+                    if k:
+                        currX = k.winfo_x()
+                        currY = k.winfo_y()
+                        k.geometry("{0}x{0}+{1}+{2}".format(BLOCK_SIZE, (currX + mod), currY))
         else:
             if e.keysym == "Down":
                 mod = BLOCK_SIZE
 
-                lastWin = self.windows[0]
-                lastWinPos = lastWin.winfo_y() 
-
-                if ((lastWinPos + BLOCK_SIZE + mod > game.screensize[1])):
+                if ((lastWin.winfo_y() + BLOCK_SIZE + mod > game.screensize[1])):
                     return
 
-                for i, k in enumerate(self.windows):
-                    curX = k.winfo_x()
-                    curY = k.winfo_y()
-
-                    k.geometry("{0}x{0}+{1}+{2}".format(BLOCK_SIZE, curX, (curY + mod)))
+                for i in self.windows:
+                    for k in i:
+                        if k:
+                            currX = k.winfo_x()
+                            currY = k.winfo_y()
+                            k.geometry("{0}x{0}+{1}+{2}".format(BLOCK_SIZE, currX, (currY + mod)))
 
 
 if __name__ == "__main__":
 
     ws = tk.Tk()
 
-    blocks = Block(ws)
+    blocks = Block(ws, game, TETRIS_SKEW)
 
 
     ws.mainloop()
