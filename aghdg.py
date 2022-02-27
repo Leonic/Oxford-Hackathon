@@ -1,5 +1,5 @@
 import tkinter as tk
-from dfsdfs import Game, BLOCK_SIZE, TETRIS_SKEW
+from dfsdfs import TETRIS_TEE, Game, BLOCK_SIZE, TETRIS_SKEW
 
 game = Game()
 
@@ -13,7 +13,6 @@ class Block():
         root.deiconify()
 
         for i, k in enumerate(block):
-
             for j, g in enumerate(k):
                 if g == 1:
                     cWin = tk.Toplevel()
@@ -22,7 +21,7 @@ class Block():
                     canvas = tk.Canvas(cWin, height=BLOCK_SIZE, width=BLOCK_SIZE)
                     canvas.pack()
 
-                    cWin.geometry("{0}x{0}+{1}+{2}".format(BLOCK_SIZE, i * (BLOCK_SIZE * 2), j * (BLOCK_SIZE * 2)))
+                    cWin.geometry("{0}x{0}+{1}+{2}".format(BLOCK_SIZE, j * (BLOCK_SIZE * 2), i * (BLOCK_SIZE * 2)))
 
                     self.windows[i][j] = cWin
 
@@ -66,12 +65,12 @@ class Block():
 
         elif e.keysym == "Right" or e.keysym == "Left":
             if e.keysym == "Right":
-                mod = BLOCK_SIZE
+                mod = BLOCK_SIZE * 2
 
             elif e.keysym == "Left":
-                mod = -BLOCK_SIZE
+                mod = -(BLOCK_SIZE * 2)
 
-            if (((curX + (BLOCK_SIZE * len(self.windows[firstIndex[0]]))) + mod > game.screensize[0]) or (firstWin.winfo_x() + mod < 0)):
+            if ((curX + mod > game.screensize[0]) or (firstWin.winfo_x() + mod < 0)):
                 return
 
             for i in self.windows:
@@ -82,9 +81,9 @@ class Block():
                         k.geometry("{0}x{0}+{1}+{2}".format(BLOCK_SIZE, (currX + mod), currY))
         else:
             if e.keysym == "Down":
-                mod = BLOCK_SIZE
+                mod = BLOCK_SIZE * 2
 
-                if ((lastWin.winfo_y() + BLOCK_SIZE + mod > game.screensize[1])):
+                if ((lastWin.winfo_y() + (BLOCK_SIZE) + mod > game.screensize[1])):
                     return
 
                 for i in self.windows:
@@ -100,6 +99,7 @@ if __name__ == "__main__":
     ws = tk.Tk()
 
     blocks = Block(ws, game, TETRIS_SKEW)
+    block2 = Block(ws, game, TETRIS_TEE)
 
 
     ws.mainloop()
