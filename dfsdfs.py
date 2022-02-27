@@ -3,6 +3,44 @@ import threading
 
 BLOCK_SIZE = 64
 
+TETRIS_SQUARE = [
+    [0,0,0],
+    [0,0,0],
+    [0,1,1],
+    [0,1,1]
+]
+
+TETRIS_LINE = [
+    [0,0,1],
+    [0,0,1],
+    [0,0,1],
+    [0,0,1]
+]
+
+ALT = list(zip(*TETRIS_LINE))
+
+TETRIS_TEE = [
+    [0,0,0],
+    [0,0,0],
+    [0,1,0],
+    [1,1,1]
+]
+
+TETRIS_LEL = [
+    [1,0,0],
+    [1,0,0],
+    [1,0,0],
+    [1,1,1]
+]
+
+
+TETRIS_SKEW = [
+    [0,0,0],
+    [0,0,0],
+    [0,1,1],
+    [1,1,0]
+]
+
 class Game():
     def __init__(self):
         self.user32 = ctypes.windll.user32

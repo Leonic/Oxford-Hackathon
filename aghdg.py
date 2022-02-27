@@ -26,10 +26,19 @@ class Block():
     def keyup(self, e: tk.Event):
         pass
     
+    def get_location(self):
+        curX = self.windows[0].winfo_x()
+        curY = self.windows[len(self.windows) - 1].winfo_y()
+
+        return curX, curY
+
     def keydown(self, e: tk.Event):
         lastWin = lastWinPos = mod = 0
 
-        if e.keysym == "Right" or e.keysym == "Left":
+        if e.char.lower() == "x":
+            print(self.get_location())
+
+        elif e.keysym == "Right" or e.keysym == "Left":
             if e.keysym == "Right":
                 mod = BLOCK_SIZE
 
@@ -72,7 +81,6 @@ if __name__ == "__main__":
     ws = tk.Tk()
 
     blocks = Block(ws)
-
 
 
     ws.mainloop()
