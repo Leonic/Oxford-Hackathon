@@ -12,24 +12,27 @@ class Block():
         root.withdraw()
         root.deiconify()
 
-        for i, k in enumerate(block):
+        for i, k in enumerate(zip(*block)):
             for j, g in enumerate(k):
                 if g == 1:
                     cWin = tk.Toplevel()
                     cWin.bind("<KeyPress>", self.keydown)
                     cWin.bind("<KeyRelease>", self.keyup)
                     canvas = tk.Canvas(cWin, height=BLOCK_SIZE, width=BLOCK_SIZE)
+                    text = tk.Text(canvas)
+                    text.insert(1.0, str("{0}, {1}".format(i, j)))
                     canvas.pack()
+                    text.pack()
 
-                    cWin.geometry("{0}x{0}+{1}+{2}".format(BLOCK_SIZE, j * (BLOCK_SIZE * 2), i * (BLOCK_SIZE * 2)))
+                    cWin.geometry("{0}x{0}+{1}+{2}".format(BLOCK_SIZE, i * (BLOCK_SIZE * 2), j * (BLOCK_SIZE * 2)))
 
-                    self.windows[i][j] = cWin
+                    self.windows[j][i] = cWin
 
     def keyup(self, e: tk.Event):
         pass
     
     def get_first_window(self) -> tuple:
-        for i, k in enumerate(self.windows):
+        for i, k in enumerate(zip(*self.windows)):
             for j, l in enumerate(k):
                 if l != None:
                     return (l), (i, j)
@@ -38,7 +41,7 @@ class Block():
     def get_last_window(self) -> tuple:
         lastGood = None
 
-        for i, j in enumerate(self.windows):
+        for i, j in enumerate(zip(*self.windows)):
             for k, m in enumerate(j):
                 if m != None:
                     lastGood = (m), (i, k)
@@ -66,13 +69,13 @@ class Block():
         elif e.keysym == "Right" or e.keysym == "Left":
             if e.keysym == "Right":
                 mod = BLOCK_SIZE * 2
-
             elif e.keysym == "Left":
                 mod = -(BLOCK_SIZE * 2)
 
-            if ((curX + mod > game.screensize[0]) or (firstWin.winfo_x() + mod < 0)):
+            if ((lastWin.winfo_x() + mod + BLOCK_SIZE > game.screensize[0]) or (firstWin.winfo_x() + mod < 0)):
                 return
 
+            
             for i in self.windows:
                 for k in i:
                     if k:
@@ -99,7 +102,6 @@ if __name__ == "__main__":
     ws = tk.Tk()
 
     blocks = Block(ws, game, TETRIS_SKEW)
-    block2 = Block(ws, game, TETRIS_TEE)
 
 
     ws.mainloop()
