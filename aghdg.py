@@ -1,13 +1,12 @@
-from concurrent.futures import thread
-from re import T
 import threading
 from time import sleep
 import tkinter as tk
 import random
-from dfsdfs import TETRIS_LEL, TETRIS_LINE, TETRIS_SQUARE, TETRIS_TEE, Game, BLOCK_SIZE, TETRIS_SKEW
+from dfsdfs import TETRIS, TETRIS_S, TETRIS_SQUARE, Game, BLOCK_SIZE, COLOURS
 
+ws = tk.Tk()
+nextLabel = tk.StringVar()
 game = Game()
-
 class Block():
     def __init__(self, root: tk.Tk, host: Game, block):
         # Generate a 2D array to match the tetris array
@@ -17,21 +16,28 @@ class Block():
         root.withdraw()
         root.deiconify()
 
+        colour = COLOURS[random.randrange(0, len(COLOURS))]
+
         for i, k in enumerate(zip(*block)):
             for j, g in enumerate(k):
                 if g == 1:
                     cWin = tk.Toplevel()
                     cWin.bind("<KeyPress>", self.keydown)
                     cWin.bind("<KeyRelease>", self.keyup)
-                    canvas = tk.Canvas(cWin, height=BLOCK_SIZE, width=BLOCK_SIZE)
-                    text = tk.Text(canvas)
-                    text.insert(1.0, str("{0}, {1}".format(i, j)))
+
+                    canvas = tk.Canvas(cWin, height=BLOCK_SIZE, width=BLOCK_SIZE, bg=colour)
+                    canvas.configure(width=cWin.winfo_width(), height=cWin.winfo_height())
+                    # text = tk.Text(canvas)
+                    # text.insert(1.0, str("{0}, {1}".format(i, j)))
                     canvas.pack()
-                    text.pack()
+                    # text.pack()
 
                     cWin.geometry("{0}x{0}+{1}+{2}".format(BLOCK_SIZE, i * (BLOCK_SIZE * 2), j * (BLOCK_SIZE * 2)))
 
                     self.windows[j][i] = cWin
+
+        fWindow, indexes = self.get_first_window()
+        fWindow.focus()
 
     def keyup(self, e: tk.Event):
         pass
@@ -93,7 +99,7 @@ class Block():
                 if e.keysym == "Down":
                     mod = BLOCK_SIZE * 2
 
-                    if ((firstWin.winfo_y() + (BLOCK_SIZE) + mod > game.screensize[1])):
+                    if ((firstWin.winfo_y() + BLOCK_SIZE*2 + mod >= (game.bottom[1]))):
                         return
 
                     for i in self.windows:
@@ -109,10 +115,10 @@ class Block():
                 next_block()
 
 def next_block():
+    game.next_shape = random.randrange(0, len(TETRIS))
 
-    shapes = [TETRIS_SKEW, TETRIS_SQUARE, TETRIS_TEE, TETRIS_LEL, TETRIS_LINE]
-
-    game.add_block(Block(ws, game, shapes[random.randrange(0, len(shapes))]))
+def spawn_block():
+    game.add_block(Block(ws, game, TETRIS[game.next_shape]))
 
 def game_loop(game:Game):
     while True:
@@ -142,10 +148,10 @@ def game_loop(game:Game):
                                                     print("main:",(currX,currY),"secondary:",(u.winfo_x(),u.winfo_y()))
 
                                                     collided = u.winfo_y() >= currY and u.winfo_y() <= currY + BLOCK_SIZE
-                                                    collided |= u.winfo_x() >= currX and u.winfo_x()  <= currX + BLOCK_SIZE
+                                                    # collided |= u.winfo_x() >= currX and u.winfo_x()  <= currX + BLOCK_SIZE
 
-                                                    assert(u != k)
-                                                    assert(collided == False)
+                                                    # assert(u != k)
+                                                    # assert(collided == False)
 
                     
                                         
@@ -165,10 +171,16 @@ def game_loop(game:Game):
 
 if __name__ == "__main__":
 
-    ws = tk.Tk()
+    label = tk.Label(ws, textvariable=nextLabel, relief=tk.RAISED)
 
-    blocks = Block(ws, game, TETRIS_SQUARE)
-    game.add_block(blocks)
+    if game.next_shape != None:
+        nextLabel.set("Next Shape: {0}".format(TETRIS_S[game.next_shape]))
+    else:
+        nextLabel.set("No Next Shape")
+
+    # Do stuff
+    next_block()
+    spawn_block()
 
     t = threading.Thread(target=game_loop, args=(game,))
     t.start()
