@@ -122,15 +122,17 @@ def game_loop(g:Game):
                     currX = k.winfo_x()
                     currY = k.winfo_y()
 
+                    k.geometry("{0}x{0}+{1}+{2}".format(BLOCK_SIZE, (currX), currY + (BLOCK_SIZE*2)))
+
                     for a in g.blocks:
-                        for d in a.windows:
-                            for m in d:
-                                if m:
-                                    durrX = m.winfo_x()
-                                    durrY = m.winfo_y()
-                                    if (durrX >= currX) or (durrY >= durrX):
-                                        k.geometry("{0}x{0}+{1}+{2}".format(BLOCK_SIZE, (currX), currY + (BLOCK_SIZE*2)))
-                                        next_block()
+                        if a != k:
+                            for d in a.windows:
+                                for m in d:
+                                    if m:
+                                        durrX = m.winfo_x()
+                                        durrY = m.winfo_y()
+                                        if (currX >= durrX) and (currY >= durrY):
+                                            next_block()
         sleep(1)
         
 
