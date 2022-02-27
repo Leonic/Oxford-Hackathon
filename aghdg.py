@@ -15,7 +15,7 @@ class Block():
         root.withdraw()
         root.deiconify()
 
-        self.colour = COLOURS[random.randint(0, len(COLOURS))]
+        self.colour = COLOURS[random.randint(0, len(COLOURS) - 1)]
 
         for i, k in enumerate(zip(*block)):
             for j, g in enumerate(k):
@@ -25,11 +25,8 @@ class Block():
                     cWin.bind("<KeyRelease>", self.keyup)
 
                     canvas = tk.Canvas(cWin, height=BLOCK_SIZE, width=BLOCK_SIZE, bg=self.colour)
-                    canvas.configure(width=cWin.winfo_width(), height=cWin.winfo_height())
-                    # text = tk.Text(canvas)
-                    # text.insert(1.0, str("{0}, {1}".format(i, j)))
+                    canvas.config(width=500, height=500)
                     canvas.pack()
-                    # text.pack()
 
                     cWin.geometry("{0}x{0}+{1}+{2}".format(BLOCK_SIZE, i * (BLOCK_SIZE * 2), j * (BLOCK_SIZE * 2)))
 
