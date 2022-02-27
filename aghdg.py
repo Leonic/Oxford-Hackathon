@@ -135,14 +135,17 @@ def game_loop(g:Game):
                     for m in g.blocks:
                         if m != g.current_block:
                             for v in m.windows:
-                                for y in v:
-                                    if y:
-                                       print("main:",(currX,currY),"secondary:",(y.winfo_x(),y.winfo_y()))
+                                    for y in v:
+                                        if v != y:
+                                            if y:
+                                                print("main:",(currX,currY),"secondary:",(y.winfo_x(),y.winfo_y()))
 
-                                        
+                                                collided = y.winfo_y() >= currY and y.winfo_y() <= currY + BLOCK_SIZE
+                                                collided |= y.winfo_x() >= currX and y.winfo_x()  <= currX + BLOCK_SIZE
 
-                                       if not ((currX + BLOCK_SIZE) < (y.winfo_x() + BLOCK_SIZE) or (currX + BLOCK_SIZE) > (y.winfo_x() + BLOCK_SIZE) or currY < (y.winfo_y() + BLOCK_SIZE) or (currY + BLOCK_SIZE) > (y.winfo_y() + BLOCK_SIZE)):
-                                           collided = True
+                                                assert(y != k)
+                                                assert(collided == False)
+
                     
                                         
                                         
