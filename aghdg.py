@@ -117,6 +117,8 @@ def next_block():
 def game_loop(g:Game):
     while True:
         collided = False
+        # create list of coords in one block
+
         for i in g.current_block.windows:
             for k in i:
                 if k:
@@ -124,9 +126,26 @@ def game_loop(g:Game):
                     currX = k.winfo_x()
                     currY = k.winfo_y()
                     print(currX,currY)
+
                     if (currY + BLOCK_SIZE*2 >= (g.bottom[1])):
                         collided = True
+                    
+                    otherBlocks = []
 
+                    for m in g.blocks:
+                        if m != g.current_block:
+                            for v in m.windows:
+                                for y in v:
+                                    if y:
+                                       print("main:",(currX,currY),"secondary:",(y.winfo_x(),y.winfo_y()))
+
+                                        
+
+                                       if not ((currX + BLOCK_SIZE) < (y.winfo_x() + BLOCK_SIZE) or (currX + BLOCK_SIZE) > (y.winfo_x() + BLOCK_SIZE) or currY < (y.winfo_y() + BLOCK_SIZE) or (currY + BLOCK_SIZE) > (y.winfo_y() + BLOCK_SIZE)):
+                                           collided = True
+                    
+                                        
+                                        
         
         if not collided:
             for i in g.current_block.windows:
