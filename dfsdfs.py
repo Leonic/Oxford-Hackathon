@@ -27,10 +27,10 @@ TETRIS_TEE = [
 ]
 
 TETRIS_LEL = [
+    [0,0,0],
     [1,0,0],
     [1,0,0],
-    [1,0,0],
-    [1,1,1]
+    [1,1,0]
 ]
 
 
@@ -41,6 +41,10 @@ TETRIS_SKEW = [
     [1,1,0]
 ]
 
+TETRIS = [TETRIS_SKEW, TETRIS_SQUARE, TETRIS_TEE, TETRIS_LEL, TETRIS_LINE]
+TETRIS_S = ["Skew", "Square", "Tee", "L", "Line"]
+COLOURS = ["blue", "red", "purple", "yellow", "green", "white"]
+
 class Game():
     def __init__(self):
         self.user32 = ctypes.windll.user32
@@ -49,6 +53,8 @@ class Game():
         self.current_block = None
         self.bottom = (1535, 1150)
         self.blocks = []
+        # self.rows = [[0 for i in range(15)] for k in range(10)]
+        self.next_shape = None
         
     def add_block(self, block):
         self.current_block = block

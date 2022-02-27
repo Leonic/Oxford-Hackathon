@@ -1,10 +1,8 @@
-from concurrent.futures import thread
-from re import T
 import threading
 from time import sleep
 import tkinter as tk
 import random
-from dfsdfs import TETRIS_LEL, TETRIS_LINE, TETRIS_SQUARE, TETRIS_TEE, Game, BLOCK_SIZE, TETRIS_SKEW
+from dfsdfs import TETRIS, TETRIS_LEL, TETRIS_LINE, TETRIS_SQUARE, TETRIS_TEE, Game, BLOCK_SIZE, TETRIS_SKEW, COLOURS
 
 game = Game()
 
@@ -17,21 +15,25 @@ class Block():
         root.withdraw()
         root.deiconify()
 
+        self.colour = COLOURS[random.randint(0, len(COLOURS) - 1)]
+
         for i, k in enumerate(zip(*block)):
             for j, g in enumerate(k):
                 if g == 1:
                     cWin = tk.Toplevel()
                     cWin.bind("<KeyPress>", self.keydown)
                     cWin.bind("<KeyRelease>", self.keyup)
-                    canvas = tk.Canvas(cWin, height=BLOCK_SIZE, width=BLOCK_SIZE)
-                    text = tk.Text(canvas)
-                    text.insert(1.0, str("{0}, {1}".format(i, j)))
+
+                    canvas = tk.Canvas(cWin, height=BLOCK_SIZE, width=BLOCK_SIZE, bg=self.colour)
+                    canvas.config(width=500, height=500)
                     canvas.pack()
-                    text.pack()
 
                     cWin.geometry("{0}x{0}+{1}+{2}".format(BLOCK_SIZE, i * (BLOCK_SIZE * 2), j * (BLOCK_SIZE * 2)))
 
                     self.windows[j][i] = cWin
+
+        fWindow, indexes = self.get_first_window()
+        fWindow.focus()
 
     def keyup(self, e: tk.Event):
         pass
@@ -93,7 +95,7 @@ class Block():
                 if e.keysym == "Down":
                     mod = BLOCK_SIZE * 2
 
-                    if ((firstWin.winfo_y() + (BLOCK_SIZE) + mod > game.screensize[1])):
+                    if ((firstWin.winfo_y() + BLOCK_SIZE*2 + mod >= (game.bottom[1]))):
                         return
 
                     for i in self.windows:
@@ -110,9 +112,9 @@ class Block():
 
 def next_block():
 
-    shapes = [TETRIS_SKEW, TETRIS_SQUARE, TETRIS_TEE, TETRIS_LEL, TETRIS_LINE]
+    game.next_shape = random.randrange(0, len(TETRIS))
 
-    game.add_block(Block(ws, game, shapes[random.randrange(0, len(shapes))]))
+    game.add_block(Block(ws, game, TETRIS[game.next_shape]))
 
 def game_loop(game:Game):
     while True:
@@ -142,10 +144,10 @@ def game_loop(game:Game):
                                                     print("main:",(currX,currY),"secondary:",(u.winfo_x(),u.winfo_y()))
 
                                                     collided = u.winfo_y() >= currY and u.winfo_y() <= currY + BLOCK_SIZE
-                                                    collided |= u.winfo_x() >= currX and u.winfo_x()  <= currX + BLOCK_SIZE
+                                                    # collided |= u.winfo_x() >= currX and u.winfo_x()  <= currX + BLOCK_SIZE
 
-                                                    assert(u != k)
-                                                    assert(collided == False)
+                                                    # assert(u != k)
+                                                    # assert(collided == False)
 
                     
                                         
@@ -168,6 +170,7 @@ if __name__ == "__main__":
     ws = tk.Tk()
 
     blocks = Block(ws, game, TETRIS_SQUARE)
+
     game.add_block(blocks)
 
     t = threading.Thread(target=game_loop, args=(game,))
