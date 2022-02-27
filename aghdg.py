@@ -116,23 +116,27 @@ def next_block():
 
 def game_loop(g:Game):
     while True:
+        collided = False
         for i in g.current_block.windows:
             for k in i:
                 if k:
+                    
                     currX = k.winfo_x()
                     currY = k.winfo_y()
+                    print(currX,currY)
+                    if (currY + BLOCK_SIZE*2 >= (g.bottom[1])):
+                        collided = True
 
-                    k.geometry("{0}x{0}+{1}+{2}".format(BLOCK_SIZE, (currX), currY + (BLOCK_SIZE*2)))
-
-                    for a in g.blocks:
-                        if a != k:
-                            for d in a.windows:
-                                for m in d:
-                                    if m:
-                                        durrX = m.winfo_x()
-                                        durrY = m.winfo_y()
-                                        if (currX >= durrX) and (currY >= durrY):
-                                            next_block()
+        
+        if not collided:
+            for i in g.current_block.windows:
+                for k in i:
+                    if k:
+                        currX = k.winfo_x()
+                        currY = k.winfo_y()
+                        k.geometry("{0}x{0}+{1}+{2}".format(BLOCK_SIZE, (currX), currY + (BLOCK_SIZE*2)))
+        else:
+            next_block()
         sleep(1)
         
 
