@@ -1,3 +1,7 @@
+from concurrent.futures import thread
+from re import T
+import threading
+from time import sleep
 import tkinter as tk
 import random
 from dfsdfs import TETRIS_LEL, TETRIS_LINE, TETRIS_SQUARE, TETRIS_TEE, Game, BLOCK_SIZE, TETRIS_SKEW
@@ -110,6 +114,26 @@ def next_block():
 
     game.add_block(Block(ws, game, shapes[random.randrange(0, len(shapes))]))
 
+def game_loop(g:Game):
+    while True:
+        for i in g.current_block.windows:
+            for k in i:
+                if k:
+                    currX = k.winfo_x()
+                    currY = k.winfo_y()
+
+                    for a in g.blocks:
+                        for d in a.windows:
+                            for m in d:
+                                if m:
+                                    durrX = m.winfo_x()
+                                    durrY = m.winfo_y()
+                                    if (durrX >= currX) or (durrY >= durrX):
+                                        k.geometry("{0}x{0}+{1}+{2}".format(BLOCK_SIZE, (currX), currY + (BLOCK_SIZE*2)))
+                                        next_block()
+        sleep(1)
+        
+
 if __name__ == "__main__":
 
     ws = tk.Tk()
@@ -117,4 +141,6 @@ if __name__ == "__main__":
     blocks = Block(ws, game, TETRIS_SQUARE)
     game.add_block(blocks)
 
+    t = threading.Thread(target=game_loop, args=(game,))
+    t.start()
     ws.mainloop()

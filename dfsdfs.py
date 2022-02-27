@@ -54,13 +54,7 @@ class Game():
         self.current_block = block
         self.blocks.append(block)
 
-    def next_block(self):
-        
-        pass
-
     def on_tick(self):
-        pass
-    def rotate_block(self):
         pass
 
 
