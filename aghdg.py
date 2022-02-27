@@ -1,5 +1,6 @@
 import tkinter as tk
-from dfsdfs import TETRIS_TEE, Game, BLOCK_SIZE, TETRIS_SKEW
+import random
+from dfsdfs import TETRIS_LEL, TETRIS_LINE, TETRIS_SQUARE, TETRIS_TEE, Game, BLOCK_SIZE, TETRIS_SKEW
 
 game = Game()
 
@@ -59,49 +60,61 @@ class Block():
         return curX // BLOCK_SIZE, curY // BLOCK_SIZE
 
     def keydown(self, e: tk.Event):
-        curX, curY = self.get_2D_location()
-        firstWin, firstIndex = self.get_first_window()
-        lastWin, lastIndex = self.get_last_window()
-        
-        if e.char.lower() == "x":
-            pass
 
-        elif e.keysym == "Right" or e.keysym == "Left":
-            if e.keysym == "Right":
-                mod = BLOCK_SIZE * 2
-            elif e.keysym == "Left":
-                mod = -(BLOCK_SIZE * 2)
-
-            if ((lastWin.winfo_x() + mod + BLOCK_SIZE > game.screensize[0]) or (firstWin.winfo_x() + mod < 0)):
-                return
-
+        if (game.current_block == self):
+            curX, curY = self.get_2D_location()
+            firstWin, firstIndex = self.get_first_window()
+            lastWin, lastIndex = self.get_last_window()
             
-            for i in self.windows:
-                for k in i:
-                    if k:
-                        currX = k.winfo_x()
-                        currY = k.winfo_y()
-                        k.geometry("{0}x{0}+{1}+{2}".format(BLOCK_SIZE, (currX + mod), currY))
-        else:
-            if e.keysym == "Down":
-                mod = BLOCK_SIZE * 2
+            if e.char.lower() == "x":
+                pass
 
-                if ((lastWin.winfo_y() + (BLOCK_SIZE) + mod > game.screensize[1])):
+            elif e.keysym == "Right" or e.keysym == "Left":
+                if e.keysym == "Right":
+                    mod = BLOCK_SIZE * 2
+                elif e.keysym == "Left":
+                    mod = -(BLOCK_SIZE * 2)
+
+                if ((lastWin.winfo_x() + mod + BLOCK_SIZE > game.screensize[0]) or (firstWin.winfo_x() + mod < 0)):
                     return
 
+                
                 for i in self.windows:
                     for k in i:
                         if k:
                             currX = k.winfo_x()
                             currY = k.winfo_y()
-                            k.geometry("{0}x{0}+{1}+{2}".format(BLOCK_SIZE, currX, (currY + mod)))
+                            k.geometry("{0}x{0}+{1}+{2}".format(BLOCK_SIZE, (currX + mod), currY))
+            else:
+                if e.keysym == "Down":
+                    mod = BLOCK_SIZE * 2
 
+                    if ((firstWin.winfo_y() + (BLOCK_SIZE) + mod > game.screensize[1])):
+                        return
+
+                    for i in self.windows:
+                        for k in i:
+                            if k:
+                                currX = k.winfo_x()
+                                currY = k.winfo_y()
+                                k.geometry("{0}x{0}+{1}+{2}".format(BLOCK_SIZE, currX, (currY + mod)))
+            
+            curX, curY = self.get_location()
+
+            if (curX >= self.game.bottom[0] or curY >= self.game.bottom[1]):
+                next_block()
+
+def next_block():
+
+    shapes = [TETRIS_SKEW, TETRIS_SQUARE, TETRIS_TEE, TETRIS_LEL, TETRIS_LINE]
+
+    game.add_block(Block(ws, game, shapes[random.randrange(0, len(shapes))]))
 
 if __name__ == "__main__":
 
     ws = tk.Tk()
 
-    blocks = Block(ws, game, TETRIS_SKEW)
-
+    blocks = Block(ws, game, TETRIS_SQUARE)
+    game.add_block(blocks)
 
     ws.mainloop()
